@@ -1,40 +1,51 @@
-from math import sin, cos, sqrt, atan2, radians
+import pymongo
+import geopy.distance
 
-pins = set() # temp in lieu of the db, should be in backend
+
+client = pymongo.MongoClient(
+	"mongodb+srv://admin:adminadmin@cluster0-dhc2n.mongodb.net/test?retryWrites=true&w=majority")
+db = client.test_database
+
+#use [database];
+#db.dropDatabase();
 
 class Location:
 
 	radius = 6373.0 # km (radius of earth)
 
 	def __init__(name, latitude, longitude):
-		self.name = name
-		self.lat  = radians(latitude)
-		self.long = radians(longitude)
+		self.name      = name
+		self.latitude  = latitude
+		self.longitude = longitude
 
-	def closest_location(self, loc_set): # loc_set refers to pins
-		# returns the Location object closest to self
-		# returns the min_dist
+	def closest_location(self, park):
+		# returns the name of landmark closest to user
+		# returns the distance from user
 		name = ""
-		closest_loc = None # Location object to be returned
-		min_dist = 50
+		min_dist = 50 # km
 
-		for loc in loc_set:
-			dlat  = loc.lat  - self.lat
-			dlong = loc.long - self.long
+		cursor = db.posts.find({"park": park}) # grabs all landmarks in park
 
-			a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-			c = 2 * atan2(sqrt(a), sqrt(1 - a))
+		user_coords = (self.latitude, self.longitude)
 
-			dist = radius * c
+		for loc in cursor:
+			loc_coords = (loc.latitude, loc.longitude)
+
+			dist = geopy.distance.vincenty(user_coords, loc_coords).km
 
 			if dist < min_dist:
-				closest_loc = loc
-				min_dist = dist
+				dist = min_dist
+				name = loc.name
 
-		return name, closest_loc, min_dist
+		return name, min_dist
 
-	def add_pin(location):
-		pins.add(location)
+	def add_pin(park, name, latitude, longitude):
+		post = {"park": park,
+				"name": name,
+				"latitude": latitude,
+				"longitude": longitude,
+		}
+		db.posts.insert_one(post)
 		# send to db
 
 
