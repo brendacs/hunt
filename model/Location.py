@@ -6,38 +6,32 @@ client = pymongo.MongoClient(
 	"mongodb+srv://admin:adminadmin@cluster0-dhc2n.mongodb.net/test?retryWrites=true&w=majority")
 db = client.test_database
 
-#use [database];
-#db.dropDatabase();
-
 class Location:
 
-	radius = 6373.0 # km (radius of earth)
-
-	def __init__(name, latitude, longitude):
-		self.name      = name
-		self.latitude  = latitude
-		self.longitude = longitude
-
-	def closest_location(self, park):
-		# returns the name of landmark closest to user
-		# returns the distance from user
+	def closest_landmark(latitude, longitude, park):
+		# returns the names and coordinates of landmarks within 25 km of user
+		# return format tuple: (name, (latitude, longitude))
 		name = ""
-		min_dist = 50 # km
+		max_dist = 25 # km
 
 		cursor = db.posts.find({"park": park}) # grabs all landmarks in park
 
-		user_coords = (self.latitude, self.longitude)
+		coords = (latitude, longitude)
+
+		within_max_dist_lst = []
 
 		for loc in cursor:
-			loc_coords = (loc.latitude, loc.longitude)
+			loc_coords = (loc.get("latitude"), loc.get("longitude"))
 
 			dist = geopy.distance.vincenty(user_coords, loc_coords).km
 
-			if dist < min_dist:
-				dist = min_dist
-				name = loc.name
+			if dist < max_dist:
+				within_max_dist_lst.append((loc.get("name"), loc_coords))
 
-		return name, min_dist
+		return within_max_dist_lst
+
+	def closest_park(latitude, logitude):
+		# do this wesley
 
 	def add_pin(park, name, latitude, longitude):
 		post = {"park": park,
