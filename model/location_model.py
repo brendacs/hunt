@@ -3,21 +3,18 @@ import uuid
 import pymongo
 import geopy.distance
 
-import base64, os
-from docusign_esign import ApiClient, EnvelopesApi, EnvelopeDefinition, Signer, SignHere, Tabs, Recipients, Document
-
-
 client = pymongo.MongoClient(
 	"mongodb+srv://admin:adminadmin@cluster0-dhc2n.mongodb.net/test?retryWrites=true&w=majority")
 db_posts = client.test_database.posts
 
-access_token = "{ACCESS_TOKEN}"
-account_id = "{ACCOUNT_ID}"
-signer_name = "{USER_FULLNAME}"
-signer_email = "{USER_EMAIL}"
-file_name_path 
-
 class LocationModel:
+
+	@staticmethod
+	def get_pin(args): # args: _id (pin id)
+		# returns the park name, lat and long of pin
+		dummy_pin = args["_id"]
+		pin = db_posts.find({"_id": dummy_pin}).next()
+		return pin.get("park"), pin.get("latitude"), pin.get("longitude")
 
 	@staticmethod
 	def get_pins(args):
@@ -41,9 +38,6 @@ class LocationModel:
 		latitude  = args["latitude"]
 		longitude = args["longitude"]
 		radius    = args["radius"]
-
-		if radius >= 550:
-			return None
 
 		parks = []
 		dists = []
@@ -80,12 +74,15 @@ class LocationModel:
 				db_posts.insert_one(post)
 
 	@staticmethod
-	def add_pin(args): # args: park, latitude, longitude
+	def add_pin(args): # args: park, latitude, longitude, user_id
+
+		# user_id references the "_id" from the User class
 		# users can add a pin (press + hold) to a national park to increase awareness
 		# hopefully can add a photo in the future
 		park      = args["park"]
 		latitude  = args["latitude"]
 		longitude = args["longitude"]
+		user_id   = args["user_id"]
 
 		ppark = db_posts.find({"_id": park, "custom": False}).next()
 		ppark_coords = (ppark.get("latitude"), ppark.get("longitude"))
@@ -95,8 +92,11 @@ class LocationModel:
 					"latitude": latitude,
 					"longitude": longitude,
 					"custom": True,
+					"user_id": user_id,
 			}
 			db_posts.insert_one(post)
 		else:
 			print("Sorry, too far from an endpoint to post.")
+
+
 
