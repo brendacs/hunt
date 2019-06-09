@@ -2,21 +2,20 @@ import csv
 import pymongo
 import geopy.distance
 
-class Location:
-
+class LocationModel:
 	client = pymongo.MongoClient(
 		"mongodb+srv://admin:adminadmin@cluster0-dhc2n.mongodb.net/test?retryWrites=true&w=majority")
 	db_posts = client.test_database.posts
 
 	@staticmethod
-	def get_pins(latitude, longitude, park):
+	def get_pins(args):
 		# returns the names and coordinates of landmarks within 25 km of user
 		# return format tuple: (name, (latitude, longitude))
 		name = ""
 		max_dist = 50 # km
 		within_max_dist_lst = []
-		user_coords   = (latitude, longitude)
-		custom_coords = db_posts.find({"_id": park, "custom": True}) # grabs all user-created landmarks in park
+		user_coords   = (args["latitude"], args["longitude"])
+		custom_coords = db_posts.find({"_id": args["park"], "custom": True}) # grabs all user-created landmarks in park
 
 		for loc in custom_coords:
 			loc_coords = (loc.get("latitude"), loc.get("longitude"))
