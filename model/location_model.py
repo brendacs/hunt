@@ -93,7 +93,7 @@ class LocationModel:
 			}
 			db_posts.insert_one(post)
 		else:
-			print("Sorry, too far from an endpoint to post.")
+			print("Sorry, too far from a park to post.")
 
 
 
