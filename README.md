@@ -1,9 +1,8 @@
 # hunt
 
 Model
-  - Model.py
-  - Location.py
+  - user_model.py
+  - location_model.py
+  - nat_parks.csv
 
-Controller
-  - Controller.py
-  
+server.py
