@@ -38,7 +38,7 @@ class LocationModel:
 			ppark_coords = (ppark.get("latitude"), ppark.get("longitude"))
 			dist = geopy.distance.distance((latitude, longitude), ppark_coords)
 			if dist <= radius:
-				parks.append(ppark.get("park"))
+				parks.append(ppark.get("_id"))
 				dists.append(dist)
 
 		if len(parks) == 1:
@@ -46,7 +46,7 @@ class LocationModel:
 		elif len(parks) > 1:
 			return parks[dists.index(min(dists))]
 		else:
-			return get_closest_park(latitude, longitude, radius + 50)
+			return LocationModel.get_closest_park(latitude, longitude, radius + 50)
 
 	@staticmethod
 	def populate(): # should only be called once
