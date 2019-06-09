@@ -8,7 +8,6 @@ client = pymongo.MongoClient(
 db_posts = client.test_database.posts
 
 class LocationModel:
-
 	@staticmethod
 	def get_pin(args): # args: _id (pin id)
 		# returns the park name, lat and long of pin

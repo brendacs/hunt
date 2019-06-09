@@ -3,6 +3,7 @@ import re
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 from model.location_model import LocationModel
+from model.user_creation import User
 
 ROUTING = {
     "pins": {
@@ -21,6 +22,33 @@ ROUTING = {
                 "name": str,
                 "latitude": float,
                 "longitude": float
+            }
+        )
+    },
+    "park": {
+        "GET": (
+            LocationModel.get_closest_park,
+            {
+                "latitude": float,
+                "longitude": float,
+                "radius": float,
+            }
+        )
+    },
+    "user": {
+        "POST": (
+            User.register,
+            {
+                "username": str,
+                "email": str,
+                "password": str,
+            }
+        ),
+        "PUT": (
+            User.login,
+            {
+                "username": str,
+                "password": str
             }
         )
     }
@@ -46,7 +74,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 func, args = routes
                 try:
                     model_vars = self.payload_to_args(args)
-                    response = func(model_vars)
+                    response = func(model_vars) 
                 except Exception as e:
                     response = {"code": 400, "error": "Invalid Payload."}
                 if response:
@@ -78,5 +106,5 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
+    httpd = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
     httpd.serve_forever()
