@@ -3,6 +3,7 @@ import re
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 from model.location_model import LocationModel
+from user_creation import User
 
 ROUTING = {
     "pins": {
@@ -23,6 +24,33 @@ ROUTING = {
                 "longitude": float
             }
         )
+    }
+    "park": {
+        "GET": {
+            LocationModel.get_closest_park,
+            {
+                "latitude": float,
+                "longitude": float,
+                "radius": float,
+            }
+        }
+    }
+    "user": {
+        "POST": {
+            LocationModel.register,
+            {
+                "username": str,
+                "email": str,
+                "password": str,
+            }
+        },
+        "PUT": {
+            LocationModel.login,
+            {
+                "username": str,
+                "password": str
+            }
+        }
     }
 }
 
