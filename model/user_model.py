@@ -6,16 +6,16 @@ db_posts = client.test_database.posts
 
 class User:
 	@staticmethod
-	def register(username, email, password):
-		db_posts.insert_one({"_id": username,
-			"email": email,
-			"password": password,
+	def register(args):
+		db_posts.insert_one({"_id": args["username"],
+			"email": args["email"],
+			"password": args["password"],
 			})
 
 	@staticmethod
-	def login(username, password):
+	def login(args):
 		try:
-			user = db_posts.find({"_id": username})
+			user = db_posts.find({"_id": args["username"]})
 			return user.next()
 		except:
 			return {"error": "Invalid credentials.", "code": 401}

@@ -3,7 +3,7 @@ import re
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 from model.location_model import LocationModel
-from model.user_creation import User
+from model.user_model import User
 
 ROUTING = {
     "pins": {
@@ -112,5 +112,5 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    httpd = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+    httpd = HTTPServer(('127.0.0.1', 8000), SimpleHTTPRequestHandler)
     httpd.serve_forever()
