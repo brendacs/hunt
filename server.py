@@ -10,7 +10,8 @@ ROUTING = {
             LocationModel.get_pins,
             {
                 "latitude": float,
-                "longitude": float
+                "longitude": float,
+                "parkId": str
             }
         ),
         "POST": (
@@ -28,21 +29,9 @@ ROUTING = {
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler): 
     def do_GET(self):
         self.handle_request("GET")
-        # self.send_response(200)
-        # self.end_headers()
-        # self.wfile.write(b'Hello, world!')
 
     def do_POST(self):
         self.handle_request("POST")
-        # content_length = int(self.headers['Content-Length'])
-        # body = self.rfile.read(content_length)
-        # self.send_response(200)
-        # self.end_headers()
-        # response = BytesIO()
-        # response.write(b'This is POST request. ')
-        # response.write(b'Received: ')
-        # response.write(body)
-        # self.wfile.write(response.getvalue())
 
     def do_PUT(self):
         self.handle_request("PUT")
@@ -66,7 +55,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     else:
                         self.send_response(200)
                         self.end_headers()
-                        self.wfile.write(response)
+                        self.wfile.write(json.dumps(response).encode('utf-8'))
                 else:
                     self.send_response(200)
                     self.end_headers()
