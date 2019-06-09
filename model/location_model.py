@@ -1,6 +1,7 @@
 import csv
 import pymongo
 import geopy.distance
+from model.model import Model
 
 class Location:
 
@@ -73,5 +74,4 @@ class Location:
 			db_posts.insert_one(post)
 		else:
 			print("Sorry, too far from an endpoint to post.")
-
 
