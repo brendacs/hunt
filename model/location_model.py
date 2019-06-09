@@ -73,7 +73,7 @@ class LocationModel:
 				db_posts.insert_one(post)
 
 	@staticmethod
-	def add_pin(args): # args: park, latitude, longitude, user_id
+	def add_pin(args): # args: park, latitude, longitude
 
 		# user_id references the "_id" from the User class
 		# users can add a pin (press + hold) to a national park to increase awareness
@@ -81,7 +81,6 @@ class LocationModel:
 		park      = args["park"]
 		latitude  = args["latitude"]
 		longitude = args["longitude"]
-		user_id   = args["user_id"]
 
 		ppark = db_posts.find({"_id": park, "custom": False}).next()
 		ppark_coords = (ppark.get("latitude"), ppark.get("longitude"))
@@ -91,7 +90,6 @@ class LocationModel:
 					"latitude": latitude,
 					"longitude": longitude,
 					"custom": True,
-					"user_id": user_id,
 			}
 			db_posts.insert_one(post)
 		else:
