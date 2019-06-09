@@ -1,29 +1,31 @@
 import csv
+import uuid
 import pymongo
 import geopy.distance
 
+client = pymongo.MongoClient(
+	"mongodb+srv://admin:adminadmin@cluster0-dhc2n.mongodb.net/test?retryWrites=true&w=majority")
+db_posts = client.test_database.posts
+
 class LocationModel:
-	client = pymongo.MongoClient(
-		"mongodb+srv://admin:adminadmin@cluster0-dhc2n.mongodb.net/test?retryWrites=true&w=majority")
-	db_posts = client.test_database.posts
 
 	@staticmethod
 	def get_pins(args):
 		# returns the names and coordinates of landmarks within 25 km of user
 		# return format tuple: (name, (latitude, longitude))
 		name = ""
-		max_dist = 50 # km
+		max_dist = 100 # km
 		within_max_dist_lst = []
 		user_coords   = (args["latitude"], args["longitude"])
-		custom_coords = db_posts.find({"_id": args["park"], "custom": True}) # grabs all user-created landmarks in park
-
+		custom_coords = db_posts.find({"park": args["parkId"], "custom": True}) # grabs all user-created landmarks in park
 		for loc in custom_coords:
 			loc_coords = (loc.get("latitude"), loc.get("longitude"))
 			dist = geopy.distance.distance(user_coords, loc_coords).km
 			if dist < max_dist:
-				within_max_dist_lst.append((loc.get("name"), loc_coords))
-		return within_max_dist_lst
+				within_max_dist_lst.append(loc_coords)
+		return {"pins": within_max_dist_lst}
 
+	@staticmethod
 	def get_closest_park(latitude, longitude, radius = 50):
 		if radius >= 550:
 			return None
@@ -52,7 +54,7 @@ class LocationModel:
 		with open("nat_parks.csv") as file:
 			reader = csv.reader(file, delimiter = ",")
 			for row in reader:
-				if (row[0].equals("Name")):
+				if (row[0] == "Name"):
 					continue
 				post = {"_id": row[0],
 						"latitude": row[1],
@@ -65,7 +67,8 @@ class LocationModel:
 		ppark = db_posts.find({"_id": park, "custom": False}).next()
 		ppark_coords = (ppark.get("latitude"), ppark.get("longitude"))
 		if geopy.distance.distance(ppark_coords, (latitude, longitude)).km < 550:
-			post = {"park": park,
+			post = {"_id": uuid.uuid4(),
+					"park": park,
 					"latitude": latitude,
 					"longitude": longitude,
 					"custom": True,
