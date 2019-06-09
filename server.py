@@ -8,12 +8,6 @@ from model.user_model import User
 ROUTING = {
     "pins": {
         "GET": (
-            LocationModel.get_pin,
-            {
-                "_id": str,
-            }
-        ),
-        "GET": (
             LocationModel.get_pins,
             {
                 "latitude": float,
@@ -30,6 +24,14 @@ ROUTING = {
                 "longitude": float
             }
         )
+    },
+    "pin_info": {
+        "GET": (
+            LocationModel.get_pin,
+            {
+                "_id": str,
+            }
+        ),
     },
     "park": {
         "GET": (
@@ -80,7 +82,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 func, args = routes
                 try:
                     model_vars = self.payload_to_args(args)
-                    response = func(model_vars) 
+                    response = func(model_vars)
                 except Exception as e:
                     response = {"code": 400, "error": "Invalid Payload."}
                 if response:
