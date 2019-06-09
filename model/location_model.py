@@ -14,11 +14,9 @@ db_posts = client.test_database.posts
 access_token = "{ACCESS_TOKEN}"
 account_id = "{ACCOUNT_ID}"
 signer_name = "{USER_FULLNAME}"
-signer_email = "{USER_EMAIL}"
-file_name_path 
+signer_email = "{USER_EMAIL}" 
 
 class LocationModel:
-
 	@staticmethod
 	def get_pins(args):
 		# returns the names and coordinates of landmarks within 25 km of user
