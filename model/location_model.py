@@ -1,31 +1,17 @@
 import csv
 import pymongo
 import geopy.distance
-from model.model import Model
 
 
 client = pymongo.MongoClient(
 	"mongodb+srv://admin:adminadmin@cluster0-dhc2n.mongodb.net/test?retryWrites=true&w=majority")
 db = client.test_database
 
-class LocationModel(Model):
-	function_arguments = {
-		"get_pins": {
-			"latitude": str,
-			"longitude": float
-		},
-		"add_pin": {
-			"parkId": str,
-			"name": str,
-			"latitude": float,
-			"longitude": float
-		}
-	}
-
-# TODO: Add pin_info api
+class LocationModel():
+	# TODO: Add pin_info api
 
 	@staticmethod
-	def get_pins(request):
+	def get_pins(args):
 		# returns the names and coordinates of landmarks within 25 km of user
 		# return format tuple: (name, (latitude, longitude))
 		name = ""
@@ -49,6 +35,7 @@ class LocationModel(Model):
 
 	def closest_park(latitude, logitude):
 		# do this wesley
+		pass
 
 	def populate(): # should only be called once
 		with open("nat_parks.csv") as file:

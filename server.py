@@ -1,12 +1,27 @@
+import json
 import re
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 from model.location_model import LocationModel
 
-FUNCTION_ROUTING = {
+ROUTING = {
     "pins": {
-        "GET": LocationModel.get_pins,
-        "POST": LocationModel.add_pin
+        "GET": (
+            LocationModel.get_pins,
+            {
+                "latitude": float,
+                "longitude": float
+            }
+        ),
+        "POST": (
+            LocationModel.add_pin,
+            {
+                "parkId": str,
+                "name": str,
+                "latitude": float,
+                "longitude": float
+            }
+        )
     }
 }
 
@@ -34,21 +49,43 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def handle_request(self, method):
         endpoint_regex = r'(\/api\/)(\w+)'
-        matched = re.match(endpoint_regex, self.path)
-        if matched:
-            endpoint = matched.group(2)
-            func = FUNCTION_ROUTING.get(endpoint, {}).get(method)
-            if func:
-                response = func()
-                if error in response:
-                    self.send_error(response["code"])
-                    self.wfile.write(response[error])
+        path = re.match(endpoint_regex, self.path)
+        if path:
+            endpoint = path.group(2)
+            routes = ROUTING.get(endpoint, {}).get(method)
+            if routes:
+                func, args = routes
+                try:
+                    model_vars = self.payload_to_args(args)
+                    response = func(model_vars)
+                except Exception as e:
+                    response = {"code": 400, "error": "Invalid Payload."}
+                if response:
+                    if "error" in response:
+                        self.send_error(response["code"], message=response["error"])
+                    else:
+                        self.send_response(200)
+                        self.end_headers()
+                        self.wfile.write(response)
                 else:
                     self.send_response(200)
                     self.end_headers()
-                    self.wfile.write(response)
                 return
         self.send_error(404)
+
+    def payload_to_args(self, args):
+        content_length = int(self.headers.get('Content-Length', 0))
+        if not content_length:
+            if args:
+                raise RuntimeError
+            return {}
+        payload = json.loads(self.rfile.read(content_length))
+        variables = {}
+        for var_name, var_type in args.items():
+            if var_name not in payload:
+                raise RuntimeError
+            variables[var_name] = var_type(payload[var_name])
+        return variables
 
 
 if __name__ == "__main__":
