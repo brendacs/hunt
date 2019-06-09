@@ -26,7 +26,12 @@ class LocationModel:
 		return {"pins": within_max_dist_lst}
 
 	@staticmethod
-	def get_closest_park(latitude, longitude, radius = 50):
+	def get_closest_park(args): # args: latitude, longitude, radius
+		# gets the closest park in order to determine which pins to get
+		latitude  = args["latitude"]
+		longitude = args["longitude"]
+		radius    = args["radius"]
+
 		if radius >= 550:
 			return None
 
@@ -46,7 +51,8 @@ class LocationModel:
 		elif len(parks) > 1:
 			return parks[dists.index(min(dists))]
 		else:
-			return LocationModel.get_closest_park(latitude, longitude, radius + 50)
+			args["radius"] += 50
+			return LocationModel.get_closest_park(args)
 
 	@staticmethod
 	def populate(): # should only be called once
@@ -63,7 +69,13 @@ class LocationModel:
 				}
 				db_posts.insert_one(post)
 
-	def add_pin(park, latitude, longitude): # user created pins
+	def add_pin(args): # args: park, latitude, longitude
+		# users can add a pin (press + hold) to a national park to increase awareness
+		# hopefully can add a photo in the future
+		park      = args["park"]
+		latitude  = args["latitude"]
+		longitude = args["longitude"]
+
 		ppark = db_posts.find({"_id": park, "custom": False}).next()
 		ppark_coords = (ppark.get("latitude"), ppark.get("longitude"))
 		if geopy.distance.distance(ppark_coords, (latitude, longitude)).km < 550:
