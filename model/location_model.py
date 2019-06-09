@@ -1,3 +1,4 @@
+import csv
 import pymongo
 import geopy.distance
 from model.model import Model
@@ -46,12 +47,29 @@ class LocationModel(Model):
 
 		return within_max_dist_lst
 
-	@staticmethod
+	def closest_park(latitude, logitude):
+		# do this wesley
+
+	def populate(): # should only be called once
+		with open("nat_parks.csv") as file:
+			reader = csv.reader(file, delimiter = ",")
+			for row in reader:
+				if (row[0].equals("Name")):
+					continue
+				post = {"park": row[0],
+						"latitude": row[1],
+						"longitude": row[2],
+						"custom": False,
+				}
+				db.posts.insert_one(post)
+
+
+
 	def add_pin(park, name, latitude, longitude):
 		post = {"park": park,
-				"name": name,
 				"latitude": latitude,
 				"longitude": longitude,
+				"custom": True,
 		}
 		db.posts.insert_one(post)
 		# send to db
