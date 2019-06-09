@@ -3,9 +3,19 @@ import uuid
 import pymongo
 import geopy.distance
 
+import base64, os
+from docusign_esign import ApiClient, EnvelopesApi, EnvelopeDefinition, Signer, SignHere, Tabs, Recipients, Document
+
+
 client = pymongo.MongoClient(
 	"mongodb+srv://admin:adminadmin@cluster0-dhc2n.mongodb.net/test?retryWrites=true&w=majority")
 db_posts = client.test_database.posts
+
+access_token = "{ACCESS_TOKEN}"
+account_id = "{ACCOUNT_ID}"
+signer_name = "{USER_FULLNAME}"
+signer_email = "{USER_EMAIL}"
+file_name_path 
 
 class LocationModel:
 
@@ -69,6 +79,7 @@ class LocationModel:
 				}
 				db_posts.insert_one(post)
 
+	@staticmethod
 	def add_pin(args): # args: park, latitude, longitude
 		# users can add a pin (press + hold) to a national park to increase awareness
 		# hopefully can add a photo in the future
