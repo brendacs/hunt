@@ -8,6 +8,12 @@ from model.user_creation import User
 ROUTING = {
     "pins": {
         "GET": (
+            LocationModel.get_pin,
+            {
+                "_id": str,
+            }
+        ),
+        "GET": (
             LocationModel.get_pins,
             {
                 "latitude": float,
